@@ -1,4 +1,4 @@
 #!/bin/sh
 
-rsync site/* mmj@optimus.angry.com.au:/var/www/mvnvm.org/
+rsync -r site/* mmj@optimus.angry.com.au:/var/www/mvnvm.org/
 
