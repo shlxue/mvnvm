@@ -1,0 +1,14 @@
+h1,h2,h3 {
+  font-family: 'chunkfiveroman', serif;
+  font-weight: normal;
+  text-decoration: none;
+  color: #3b73af;
+  font-size: 48px;
+  text-shadow: 1px 1px 10px rgba(0,0,255,0.25);
+}
+
+body { background-color: #ebf2f9; }
+
+#container { margin: 0 auto; width: 800px; background:#ccd9ea; }
+#content { clear: left; padding: 20px; }
+.center { text-align: center; }
