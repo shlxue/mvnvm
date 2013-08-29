@@ -14,9 +14,30 @@
   <div id="content">
     <h1 class="center">Maven Version Manager</h1>
     <h2 class="center">Manage your mavens. Easy.</h1>
-    <div class="block center">
+    <div class="block center first">
       <p>Set the version of maven with your project.</p>
+      <div class="code center"><prompt>$</prompt> <cmd>cat mvnvm.properties</cmd>
+<property>mvn_version</property>=<value>3.0.5</value></div>
+      <p>Once.</p>
     </div>
+	<div class="block center">
+		<div class="left column">
+		<h3>Team Members</h3>
+		<p>Everyone in your team is guaranteed to be working with the same version.</p>
+		</div>
+		<div class="right column">
+		<h3>Build System</h3>
+		<p>No need to install multiple versions of maven on all of your build agents.</p>
+		</div>
+	</div>
+	<div class="block center">
+		<h1>Installation</h1>
+		<div class="code center"><cmd>curl -s https://bitbucket.org/mjensen/mvnvm/raw/master/mvn > ~/bin/mvn && chmod 0755 ~/bin/mvn</cmd></div>
+	</div>
+	<div class="block center">
+		<h1>Usage</h1>
+		<div class="code center"><prompt>$</prompt> <cmd>echo "mvn_version=3.0.5" > mvnvm.properties</cmd></div>
+	</div>
   </div>
 </div>
 
