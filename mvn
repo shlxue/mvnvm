@@ -107,9 +107,7 @@ process_project
 process_user_defaults
 process_arguments "$@"
 make_url "${mvn_uri}" "${mvn_version}"
-
-echoerr "maven version: ${mvn_version}"
-
+debug "maven version: ${mvn_version}"
 prepareDirectories
 downloadMaven
 unzipMaven
