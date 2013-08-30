@@ -8,7 +8,17 @@ h1,h2,h3 {
 h1 { font-size: 48px; }
 h2 { font-size: 18px; text-shadow: none; }
 
-body { background-color: #ebf2f9; font-family: sans-serif; color: #205081; }
+* {
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #ebf2f9;
+  font: 16px/1.428571429 sans-serif;
+  color: #205081;
+  margin: 0;
+ }
 
 div.code {
   background: black;
@@ -20,7 +30,7 @@ div.code {
   border: solid 1px white;
   padding: 10px;
   text-align: left;
-  white-space:pre;
+  white-space:pre-wrap;
 }
 div.code prompt { color: #14892c; font-weight: bold;}
 div.code property { color: #70b0b0; font-weight: bold;}
@@ -29,13 +39,24 @@ div.code cmd { color: #d0d0d0; font-weight: bold;}
 div.block { border-top: 1px solid rgba(0, 0, 0, 0.5); margin-top: 15px; overflow: hidden; width: 100%; }
 div.block.first { margin-top: 35px; }
 
-div.block div.column { padding: 15px 15px 0px 15px; width: 300px; display:inline-block; font-size: 16px; }
+div.block div.column { padding: 15px 15px 0px 15px; width: 360px; }
 div.block div.left { float: left; }
 div.block div.right { float: right;}
 
 div.footer { font-size:12px; text-align:right; }
 div.footer ul li {display:inline;}
 
-#container { margin: 0 auto; width: 800px; background:#ccd9ea; border-radius: 5px; }
+#container { margin: 10px auto; width: 800px; background:#ccd9ea; border-radius: 5px; }
 #content { clear: left; padding: 20px 20px 5px 20px; }
 .center { text-align: center; }
+
+@media screen and (max-width: 800px ) {
+  #container {
+    width: 100%;
+    border-radius: 0;
+  }
+  div.block div.column {
+    float: none;
+    width: 100%;
+  }
+}
