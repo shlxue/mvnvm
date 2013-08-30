@@ -88,7 +88,7 @@ downloadMaven() {
     echoerr "         to: ${local_dir}/${download_file}"
   
     if which curl >/dev/null; then
-      curl --silet --fail "${download_url}" --output "${local_dir}/${download_file}"
+      curl --silent --fail "${download_url}" --output "${local_dir}/${download_file}"
     elif which wget >/dev/null; then
       wget --quiet -P "${local_dir}" "${download_url}"
     fi
