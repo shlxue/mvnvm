@@ -34,6 +34,8 @@ process_project()
 {
   if [[ -f mvnvm.properties ]]; then
     . mvnvm.properties
+  elif project_mvn_version="$("$(dirname "$0")/project-maven-version.rb")"; then
+    mvn_version="$project_mvn_version"
   fi
 }
 
