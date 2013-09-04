@@ -73,7 +73,7 @@ execRunner () {
   export MVN_HOME="${local_dir}/apache-maven-${mvn_version}"
   export M2_HOME="${MVN_HOME}"
   export MVN_OPT=""
-  { "$@"; }
+  "$@";
 }
 
 prepareDirectories() {
