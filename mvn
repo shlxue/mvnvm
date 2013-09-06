@@ -14,7 +14,6 @@ for arg in "$@"; do
   case $arg in
     -q|--quiet) quiet=true ;;
     -d|--debug) debug=true ;;
-    -v|--verbose) verbose=true ;;
     *) ;;
   esac
 done
@@ -45,7 +44,6 @@ process_arguments()
       --apache-mirror) mvn_uri="$2" && shift 2 && debug "set mvn_uri: ${mvn_uri}" ;;
       --mvn-version) mvn_version="$2" && shift 2 && debug "set mvn_version: ${mvn_version}" ;;
       -d|--debug) shift ;;
-      -v|--verbose) shift ;;
       -q|--quiet) shift ;;
       *) addMvnArgument "$1" && shift ;;
     esac
