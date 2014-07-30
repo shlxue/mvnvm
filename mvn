@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
 declare -r default_mvn_version=3.0.5
-declare -r default_mvn_uri=www.us.apache.org/dist
+declare -r default_mvn_uri=archive.apache.org/dist/maven/binaries
 declare -r default_local_dir=${HOME}/.mvnvm
-declare mvn_version mvn_arguments mvn_uri download_url download_file local_dir
+declare mvn_version mvn_uri download_url download_file local_dir
+declare -a mvn_arguments
 
 echoerr () { [[ -z $quiet ]] && echo "[MVNVM]" "$@" >&2; }
 debug()    { [[ -n $debug ]] && echoerr "$@"; }
@@ -13,7 +14,6 @@ for arg in "$@"; do
   case $arg in
     -q|--quiet) quiet=true ;;
     -d|--debug) debug=true ;;
-    -v|--verbose) verbose=true ;;
     *) ;;
   esac
 done
@@ -44,7 +44,6 @@ process_arguments()
       --apache-mirror) mvn_uri="$2" && shift 2 && debug "set mvn_uri: ${mvn_uri}" ;;
       --mvn-version) mvn_version="$2" && shift 2 && debug "set mvn_version: ${mvn_version}" ;;
       -d|--debug) shift ;;
-      -v|--verbose) shift ;;
       -q|--quiet) shift ;;
       *) addMvnArgument "$1" && shift ;;
     esac
@@ -74,7 +73,7 @@ execRunner () {
   export MVN_HOME="${local_dir}/apache-maven-${mvn_version}"
   export M2_HOME="${MVN_HOME}"
   export MVN_OPT=""
-  { "$@"; }
+  exec "$@"
 }
 
 prepareDirectories() {
@@ -116,8 +115,12 @@ process_arguments "$@"
 make_url "${mvn_uri}" "${mvn_version}"
 debug "maven version: ${mvn_version}"
 prepareDirectories
+
+echoerr "Using maven: ${mvn_version}"
+
 downloadMaven
 unzipMaven
 
 execRunner "${local_dir}/apache-maven-${version}/bin/mvn" "${mvn_arguments[@]}"
+
 
