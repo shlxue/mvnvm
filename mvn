@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
 declare -r default_mvn_version=3.0.5
-declare -r default_mvn_uri=www.us.apache.org/dist
 declare -r default_local_dir=${HOME}/.mvnvm
-declare mvn_version mvn_uri download_url download_file local_dir
+declare mvn_version user_uri user_download_url mirror_download_url archive_download_url download_file local_dir
 declare -a mvn_arguments
 
 echoerr () { [[ -z $quiet ]] && echo "[MVNVM]" "$@" >&2; }
@@ -41,7 +40,7 @@ process_arguments()
 {
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      --apache-mirror) mvn_uri="$2" && shift 2 && debug "set mvn_uri: ${mvn_uri}" ;;
+      --apache-mirror) user_uri="$2" && shift 2 && debug "set user_uri: ${user_uri}" ;;
       --mvn-version) mvn_version="$2" && shift 2 && debug "set mvn_version: ${mvn_version}" ;;
       -d|--debug) shift ;;
       -q|--quiet) shift ;;
@@ -52,8 +51,8 @@ process_arguments()
 
 process_defaults()
 {
+  user_uri=""
   mvn_version=${default_mvn_version}
-  mvn_uri=${default_mvn_uri}
   local_dir=${default_local_dir}
 }
 
@@ -65,8 +64,42 @@ make_url()
   [[ $version =~ ${version_regex} ]]
   major="${BASH_REMATCH[1]}"
   download_file="apache-maven-${version}-bin.zip"
-  download_url="http://${uri}/maven/maven-${major}/${version}/binaries/${download_file}"
+  download_path_url="maven/maven-${major}/${version}/binaries/${download_file}"
+
+  # If the user has provided a URI, append the 
+  if [ -z "$uri" ]; then
+    user_download_url=""
+  else
+    user_download_url="${uri}/${download_path_url}"
+  fi
+
+  # archive url is always available, so set that
   archive_download_url="https://archive.apache.org/dist/maven/binaries/${download_file}"
+
+  # instead of always using archive url, use the recommended apache mirror initially
+  if which curl >/dev/null; then
+    closer_json=`curl --silent --fail http://www.apache.org/dyn/closer.cgi?asjson=1`
+  elif which wget >/dev/null; then
+    closer_json=`wget -qO- http://www.apache.org/dyn/closer.cgi?asjson=1`
+  fi
+
+  if [ -z "$closer_json" ]; then
+    release_download_url=""
+  else
+    # parse the json for the preferred mirror url
+    temp=`echo $closer_json \
+     | sed 's/\\\\\//\//g' \
+     | sed 's/[{}]//g' \
+     | awk -v k="text" '{n=split($0,a,","); for (i=1; i<=n; i++) print a[i]}' \
+     | sed 's/\"\:\"/\|/g' \
+     | sed 's/[\,]/ /g' \
+     | sed 's/\"//g' \
+     | grep -w "preferred" \
+     | awk -F: '{n=index($0,":");print substr($0,n+1)}' \
+     | tr -d ' '`
+
+    release_download_url="${temp}${download_path_url}"
+  fi
 }
 
 execRunner () {
@@ -84,18 +117,31 @@ prepareDirectories() {
 
 downloadMaven() {
   if [[ ! -f "${local_dir}/${download_file}" ]]; then
-    echoerr "downloading: ${download_url}"
-    echoerr "         to: ${local_dir}/${download_file}"
-  
-    if which curl >/dev/null; then
-      curl --silent --fail "${download_url}" --output "${local_dir}/${download_file}" || {
-        echoerr "Falling back to archive: ${archive_download_url}"
-        curl --silent --fail "${archive_download_url}" --output "${local_dir}/${download_file}"
+    echoerr "            downloading: ${download_file}"
+    echoerr "                     to: ${local_dir}/${download_file}"
+    
+    if [ -z "$user_download_url" ]; then
+        # nothing
+        true
+    else
+        echoerr "                 trying: ${user_download_url}"
+    fi
+
+    if which curl >/dev/null; then      
+      curl --silent --fail "${user_download_url}" --output "${local_dir}/${download_file}" || {
+        echoerr "trying preferred mirror: ${release_download_url}"
+        curl --silent --fail "${release_download_url}" --output "${local_dir}/${download_file}" || {
+          echoerr "Falling back to archive: ${archive_download_url}"
+          curl --silent --fail "${archive_download_url}" --output "${local_dir}/${download_file}"
+        }
       }
     elif which wget >/dev/null; then
-      wget --quiet -P "${local_dir}" "${download_url}" || {
-        echoerr "Falling back to archive: ${archive_download_url}"
-        wget --quiet -P "${local_dir}" "${archive_download_url}"
+      wget --quiet -P "${local_dir}" "${user_download_url}" || {
+        echoerr "trying preferred mirror: ${release_download_url}"
+        wget --quiet -P "${local_dir}" "${release_download_url}" || {
+          echoerr "Falling back to archive: ${archive_download_url}"
+          wget --quiet -P "${local_dir}" "${archive_download_url}"
+        }
       }
     fi
   fi
@@ -103,7 +149,7 @@ downloadMaven() {
 
 unzipMaven() {
   if [[ ! -d "${local_dir}/apache-maven-${version}" ]]; then
-    echoerr " extracting: ${local_dir}/apache-maven-${version}"
+    echoerr "             extracting: ${local_dir}/apache-maven-${version}"
     unzip -o -qq -d "${local_dir}" "${local_dir}/${download_file}"
   fi
 }
@@ -112,7 +158,7 @@ process_defaults
 process_project
 process_user_defaults
 process_arguments "$@"
-make_url "${mvn_uri}" "${mvn_version}"
+make_url "${user_uri}" "${mvn_version}"
 debug "maven version: ${mvn_version}"
 prepareDirectories
 
@@ -122,5 +168,3 @@ downloadMaven
 unzipMaven
 
 execRunner "${local_dir}/apache-maven-${version}/bin/mvn" "${mvn_arguments[@]}"
-
-
