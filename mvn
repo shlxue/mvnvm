@@ -65,7 +65,8 @@ make_url()
   [[ $version =~ ${version_regex} ]]
   major="${BASH_REMATCH[1]}"
   download_file="apache-maven-${version}-bin.zip"
-  download_url="http://${uri}/${download_file}"
+  download_url="http://${uri}/maven/maven-${major}/${version}/binaries/${download_file}"
+  archive_download_url="https://archive.apache.org/dist/maven/binaries/${download_file}"
 }
 
 execRunner () {
@@ -87,9 +88,15 @@ downloadMaven() {
     echoerr "         to: ${local_dir}/${download_file}"
   
     if which curl >/dev/null; then
-      curl --silent --fail "${download_url}" --output "${local_dir}/${download_file}"
+      curl --silent --fail "${download_url}" --output "${local_dir}/${download_file}" || {
+        echoerr "Falling back to archive: ${archive_download_url}"
+        curl --silent --fail "${archive_download_url}" --output "${local_dir}/${download_file}"
+      }
     elif which wget >/dev/null; then
-      wget --quiet -P "${local_dir}" "${download_url}"
+      wget --quiet -P "${local_dir}" "${download_url}" || {
+        echoerr "Falling back to archive: ${archive_download_url}"
+        wget --quiet -P "${local_dir}" "${archive_download_url}"
+      }
     fi
   fi
 }
