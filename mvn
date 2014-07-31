@@ -78,20 +78,18 @@ make_url()
 
   # instead of always using archive url, use the recommended apache mirror initially
   if which curl >/dev/null; then
-    closer_json=`curl --silent --fail http://www.apache.org/dyn/closer.cgi?asjson=1`
+    closer_text=`curl --silent --fail http://www.apache.org/dyn/closer.cgi?asjson=1`
   elif which wget >/dev/null; then
-    closer_json=`wget -qO- http://www.apache.org/dyn/closer.cgi?asjson=1`
+    closer_text=`wget -qO- http://www.apache.org/dyn/closer.cgi?asjson=1`
   fi
 
-  if [ -z "$closer_json" ]; then
+  if [ -z "$closer_text" ]; then
     release_download_url=""
   else
-    # extract the preferred mirror url from returned json
-    temp=`echo $closer_json \
-     | awk -F=":" -v RS=",|{|}" '$1~/"preferred"/ {print}' \
-     | sed 's/[\"{}]//g' \
-     | awk -F: '{n=index($0,":");print substr($0,n+1)}' \
-     | tr -d ' '`
+    # extract the preferred mirror url from returned text
+    temp=`echo $closer_text \
+     | fgrep preferred \
+     | cut -f4 -d\"`
 
     release_download_url="${temp}${download_path_url}"
   fi
