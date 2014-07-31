@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 declare -r default_mvn_version=3.0.5
-declare -r default_mvn_uri=archive.apache.org/dist/maven/binaries
+declare -r default_mvn_uri=www.us.apache.org/dist
 declare -r default_local_dir=${HOME}/.mvnvm
 declare mvn_version mvn_uri download_url download_file local_dir
 declare -a mvn_arguments
