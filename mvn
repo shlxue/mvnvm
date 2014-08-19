@@ -41,6 +41,10 @@ include REXML
 
 pomfile = ARGV.concat( ['pom.xml'] )[0]
 
+if !File.file?(pomfile)
+  exit 5
+end
+
 xmldoc = Document.new(File.new(pomfile))
 
 enforcerVersion = XPath.first(xmldoc, '/project/build/plugins/plugin[artifactId="maven-enforcer-plugin"]//configuration/rules/requireMavenVersion/version')
