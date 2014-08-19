@@ -54,8 +54,10 @@ if enforcerVersion
   m = enforcerVersion.text.match(/\s*\[([\d\.]+)\s*,.*/)
   if m
     puts m[1]
-  else
+  elsif enforcerVersion.text.match(/^[\d\.]+$/)
     puts enforcerVersion.text
+  else
+    exit 5
   end
 else
   prereq = XPath.first(xmldoc, '/project/prerequisites/maven')
