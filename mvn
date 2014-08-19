@@ -33,7 +33,7 @@ process_project()
 {
   if [[ -f mvnvm.properties ]]; then
     . mvnvm.properties
-  elif project_mvn_version="$(ruby <<EOR
+  elif project_mvn_version="$(ruby <<"EOR"
 #!/usr/bin/ruby -w
 
 require 'rexml/document'
@@ -61,7 +61,8 @@ else
     exit 5
   end
 end
-EOR)"; then
+EOR
+)"; then
     mvn_version="$project_mvn_version"
   fi
 }
