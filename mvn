@@ -54,6 +54,7 @@ if enforcerVersion
   m = enforcerVersion.text.match(/\s*\[([\d\.]+)\s*,.*/)
   if m
     puts m[1]
+  # A specific numeric version?
   elsif enforcerVersion.text.match(/^[\d\.]+$/)
     puts enforcerVersion.text
   else
