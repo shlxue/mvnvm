@@ -41,6 +41,10 @@ include REXML
 
 pomfile = ARGV.concat( ['pom.xml'] )[0]
 
+if !File.file?(pomfile)
+  exit 5
+end
+
 xmldoc = Document.new(File.new(pomfile))
 
 enforcerVersion = XPath.first(xmldoc, '/project/build/plugins/plugin[artifactId="maven-enforcer-plugin"]//configuration/rules/requireMavenVersion/version')
@@ -50,8 +54,11 @@ if enforcerVersion
   m = enforcerVersion.text.match(/\s*\[([\d\.]+)\s*,.*/)
   if m
     puts m[1]
-  else
+  # A specific numeric version?
+  elsif enforcerVersion.text.match(/^[\d\.]+$/)
     puts enforcerVersion.text
+  else
+    exit 5
   end
 else
   prereq = XPath.first(xmldoc, '/project/prerequisites/maven')
