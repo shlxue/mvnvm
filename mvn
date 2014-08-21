@@ -31,9 +31,29 @@ process_user_defaults()
 
 process_project()
 {
-  if [[ -f mvnvm.properties ]]; then
-    . mvnvm.properties
-  elif project_mvn_version="$(ruby <<"EOR"
+  curdir=`pwd`
+  found=0
+
+  # traverse the directory structure up to root, trying to find a mvnvm.properties file
+  while [[ true ]]; do
+    if [[ -f mvnvm.properties ]]; then
+      . mvnvm.properties
+      found=1
+      break
+    fi
+    
+    if [[ "`pwd`" == '/' ]]; then
+      break
+    fi
+
+    cd ..
+  done
+
+  # reset the current working directory
+  cd $curdir
+
+  if [[ ${found} == 0 ]]; then
+    if project_mvn_version="$(ruby <<"EOR"
 #!/usr/bin/ruby -w
 
 require 'rexml/document'
@@ -72,6 +92,7 @@ EOR
 )"; then
     mvn_version="$project_mvn_version"
   fi
+fi
 }
 
 process_arguments() 
