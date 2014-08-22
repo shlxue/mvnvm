@@ -35,7 +35,8 @@ process_project()
   found=0
 
   # traverse the directory structure up to root, trying to find a mvnvm.properties file
-  while [[ true ]]; do
+  while : 
+  do
     if [[ -f mvnvm.properties ]]; then
       . mvnvm.properties
       found=1
@@ -52,7 +53,7 @@ process_project()
   # reset the current working directory
   cd $curdir
 
-  if [[ ${found} == 0 ]]; then
+  if [[ ${found} -eq 0 ]]; then
     if project_mvn_version="$(ruby <<"EOR"
 #!/usr/bin/ruby -w
 
