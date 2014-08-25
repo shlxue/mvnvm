@@ -31,7 +31,7 @@ process_user_defaults()
 
 process_project()
 {
-  curdir=`pwd`
+  curdir="`pwd`"
   found=0
 
   # traverse the directory structure up to root, trying to find a mvnvm.properties file
@@ -51,7 +51,7 @@ process_project()
   done
 
   # reset the current working directory
-  cd $curdir
+  cd "${curdir}"
 
   if [[ ${found} -eq 0 ]]; then
     if project_mvn_version="$(ruby <<"EOR"
