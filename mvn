@@ -193,8 +193,8 @@ downloadMaven() {
 }
 
 unzipMaven() {
-  if [[ ! -d "${local_dir}/apache-maven-${version}" ]]; then
-    echoerr "             extracting: ${local_dir}/apache-maven-${version}"
+  if [[ ! -d "${local_dir}/apache-maven-${mvn_version}" ]]; then
+    echoerr "             extracting: ${local_dir}/apache-maven-${mvn_version}"
     unzip -o -qq -d "${local_dir}" "${local_dir}/${download_file}"
   fi
 }
@@ -203,13 +203,21 @@ process_defaults
 process_project
 process_user_defaults
 process_arguments "$@"
-make_url "${user_uri}" "${mvn_version}"
+
 debug "maven version: ${mvn_version}"
-prepareDirectories
 
 echoerr "Using maven: ${mvn_version}"
 
-downloadMaven
-unzipMaven
+if [[ ! -d "${local_dir}/apache-maven-${mvn_version}" ]]; then
+  debug "Maven ${mvn_version} not currently installed"
 
-execRunner "${local_dir}/apache-maven-${version}/bin/mvn" "${mvn_arguments[@]}"
+  make_url "${user_uri}" "${mvn_version}"
+  prepareDirectories
+
+  downloadMaven
+  unzipMaven
+else
+  debug "Maven ${mvn_version} is installed"
+fi
+
+execRunner "${local_dir}/apache-maven-${mvn_version}/bin/mvn" "${mvn_arguments[@]}"
