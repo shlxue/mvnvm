@@ -31,27 +31,24 @@ process_user_defaults()
 
 process_project()
 {
-  curdir="`pwd`"
+  dir="`pwd`"
   found=0
 
   # traverse the directory structure up to root, trying to find a mvnvm.properties file
   while : 
   do
-    if [[ -f mvnvm.properties ]]; then
-      . mvnvm.properties
+    if [[ -f "$dir/mvnvm.properties" ]]; then
+      . "$dir/mvnvm.properties"
       found=1
       break
     fi
     
-    if [[ "`pwd`" == '/' ]]; then
+    if [[ "$dir" == '/' ]]; then
       break
     fi
 
-    cd ..
+    dir=`dirname "$dir"`
   done
-
-  # reset the current working directory
-  cd "${curdir}"
 
   if [[ ${found} -eq 0 ]]; then
     if project_mvn_version="$(ruby <<"EOR"
