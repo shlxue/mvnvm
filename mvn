@@ -135,12 +135,15 @@ make_url()
     user_download_url="${uri}/${download_path_url}"
   fi
 
+  apache_archive_url="https://archive.apache.org/dist"
+  apache_binaries_archive_url="${apache_archive_url}/maven/binaries"
+
   # archive url is always available, so set that
-  archive_download_url="https://archive.apache.org/dist/${download_path_url}"
+  archive_download_url="${apache_archive_url}/${download_path_url}"
   # but some old versions are only available at archived binaries path
-  binaries_archive_download_url="https://archive.apache.org/dist/maven/binaries/${download_file}"
+  binaries_archive_download_url="${apache_binaries_archive_url}/${download_file}"
   # some older versions of maven use an even different url
-  older_binaries_archive_download_url="https://archive.apache.org/dist/maven/binaries/${download_old_file}"
+  older_binaries_archive_download_url="${apache_binaries_archive_url}/${download_old_file}"
 
   # instead of always using archive url, use the recommended apache mirror initially
   if which curl >/dev/null; then
