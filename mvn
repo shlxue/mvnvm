@@ -40,7 +40,7 @@ process_project()
     if [[ -f "$dir/mvnvm.properties" ]]; then
       . "$dir/mvnvm.properties"
       found=1
-      debug "Found mvnvm.properties file at `pwd`"
+      debug "Found mvnvm.properties file at $dir"
       break
     fi
     
@@ -182,10 +182,24 @@ prepareDirectories() {
   fi
 }
 
+function download() {
+  if [ -z "${2}" ]; then
+    return -1
+  fi
+
+  echoerr "${1}: ${2}"
+  if which curl >/dev/null; then
+    curl --silent --fail "${2}" --output "${3}"
+  elif which wget >/dev/null; then
+    wget --quiet -O "${3}" "${2}"
+  fi
+  return $?
+}
+
 downloadMaven() {
   if [[ ! -f "${local_dir}/${download_file}" ]]; then
-    echoerr "            downloading: ${download_file}"
-    echoerr "                     to: ${local_dir}/${download_file}"
+    echoerr  "            downloading: ${download_file}"
+    echoerr  "                     to: ${local_dir}/${download_file}"
     
     if [ -z "$user_download_url" ]; then
         # nothing
@@ -194,35 +208,26 @@ downloadMaven() {
         echoerr "                 trying: ${user_download_url}"
     fi
 
-    if which curl >/dev/null; then      
-      curl --silent --fail "${user_download_url}" --output "${local_dir}/${download_file}" || {
-        echoerr "trying preferred mirror: ${release_download_url}"
-        curl --silent --fail "${release_download_url}" --output "${local_dir}/${download_file}" || {
-          echoerr "falling back to archive: ${archive_download_url}"
-          curl --silent --fail "${archive_download_url}" --output "${local_dir}/${download_file}" || {
-            echoerr "must be old archive url: ${binaries_archive_download_url}"
-            curl --silent --fail "${binaries_archive_download_url}" --output "${local_dir}/${download_file}" || {
-              echoerr " the really old archive: ${older_binaries_archive_download_url}"
-              curl --silent --fail "${older_binaries_archive_download_url}" --output "${local_dir}/${download_old_file}"
-            }
-          }
-        }
-      }
-    elif which wget >/dev/null; then
-      wget --quiet -P "${local_dir}" "${user_download_url}" || {
-        echoerr "trying preferred mirror: ${release_download_url}"
-        wget --quiet -P "${local_dir}" "${release_download_url}" || {
-          echoerr "falling back to archive: ${archive_download_url}"
-          wget --quiet -P "${local_dir}" "${archive_download_url}" || {
-            echoerr "must be old archive url: ${binaries_archive_download_url}"
-            wget --quiet -P "${local_dir}" "${binaries_archive_download_url}" || {
-              echoerr " the really old archive: ${older_binaries_archive_download_url}"
-              wget --quiet -P "${local_dir}" "${older_binaries_archive_download_url}"  
-            }
-          }
-        }
-      }
-    fi
+    urls[0]="${user_download_url}"
+    urls[1]="${release_download_url}"
+    urls[2]="${archive_download_url}"
+    urls[3]="${binaries_archive_download_url}"
+    urls[4]="${older_binaries_archive_download_url}"
+
+    names[0]="          user download"
+    names[1]="       preferred mirror"
+    names[2]="                archive"
+    names[3]="            old archive"
+    names[4]="     really old archive"
+
+    for i in "${!urls[@]}"
+    do
+      download "${names[i]}" "${urls[i]}" "${local_dir}/${download_file}"
+      if [ $? == 0 ]; then
+        break
+      fi
+    done
+
   fi
 }
 
