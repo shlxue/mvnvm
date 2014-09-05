@@ -40,7 +40,7 @@ process_project()
     if [[ -f "$dir/mvnvm.properties" ]]; then
       . "$dir/mvnvm.properties"
       found=1
-      debug "Found mvnvm.properties file at `pwd`"
+      debug "Found mvnvm.properties file at $dir"
       break
     fi
     
