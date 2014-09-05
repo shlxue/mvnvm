@@ -222,8 +222,7 @@ downloadMaven() {
 
     for i in "${!urls[@]}"
     do
-      download "${names[i]}" "${urls[i]}" "${local_dir}/${download_file}"
-      if [ $? == 0 ]; then
+      if download "${names[i]}" "${urls[i]}" "${local_dir}/${download_file}"; then
         break
       fi
     done
