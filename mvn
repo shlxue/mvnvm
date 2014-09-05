@@ -22,10 +22,22 @@ addMvnArgument() {
   mvn_arguments=( "${mvn_arguments[@]}" "$1" )
 }
 
+read_properties()
+{
+  file="$1"
+  while IFS="=" read -r key value; do
+    case "$key" in
+      "local_dir") local_dir="$value" ;;
+      "mvn_version") mvn_version="$value" ;;
+      "user_uri") user_uri="$value" ;;
+    esac
+  done < "$file"
+}
+
 process_user_defaults()
 {
   if [[ -f ~/.mvnvm.properties ]]; then
-    . ~/.mvnvm.properties
+    read_properties ~/.mvnvm.properties
   fi
 }
 
@@ -38,7 +50,7 @@ process_project()
   while : 
   do
     if [[ -f "$dir/mvnvm.properties" ]]; then
-      . "$dir/mvnvm.properties"
+      read_properties "$dir/mvnvm.properties"
       found=1
       debug "Found mvnvm.properties file at $dir"
       break
