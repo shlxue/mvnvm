@@ -231,12 +231,12 @@ downloadMaven() {
 
 unzipMaven() {
   if [[ ! -d "${local_dir}/apache-maven-${mvn_version}" && ! -d "${local_dir}/maven-${mvn_version}" ]]; then
-    if [[ -f "${local_dir}/${download_old_file}" ]]; then
-      echoerr "             extracting: ${local_dir}/maven-${mvn_version}"
-      unzip -o -qq -d "${local_dir}" "${local_dir}/${download_old_file}"
-    else
+    if [[ -f "${local_dir}/${download_file}" ]]; then
       echoerr "             extracting: ${local_dir}/apache-maven-${mvn_version}"
       unzip -o -qq -d "${local_dir}" "${local_dir}/${download_file}"
+    else
+      echoerr "             extracting: ${local_dir}/maven-${mvn_version}"
+      unzip -o -qq -d "${local_dir}" "${local_dir}/${download_old_file}"
     fi
   fi
 }
@@ -262,10 +262,10 @@ else
   debug "Maven ${mvn_version} is installed"
 fi
 
-if [[ -d "${local_dir}/maven-${mvn_version}" ]]; then
-  runpath="${local_dir}/maven-${mvn_version}"
-else
+if [[ -d "${local_dir}/apache-maven-${mvn_version}" ]]; then
   runpath="${local_dir}/apache-maven-${mvn_version}"
+else
+  runpath="${local_dir}/maven-${mvn_version}"
 fi
 
 debug "Executing maven from ${runpath}"
