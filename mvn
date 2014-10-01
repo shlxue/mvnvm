@@ -168,7 +168,7 @@ make_url()
     # use python if it is available, otherwise fall back to attempt scraping from text
     if which python >/dev/null; then
       temp=`echo $closer_text \
-        | python -c 'import sys, json; print json.load(sys.stdin)["preferred"]'`
+        | python -c 'import sys, json; print(json.load(sys.stdin)["preferred"])'`
     else 
       temp=`echo $closer_text \
         | fgrep preferred \
