@@ -28,6 +28,7 @@ read_properties()
   while IFS="=" read -r key value; do
     case "$key" in
       "local_dir") local_dir="$value" ;;
+      "mvn_opts") export MAVEN_OPTS="$value" ;;
       "mvn_version") mvn_version="$value" ;;
       "user_uri") user_uri="$value" ;;
     esac
