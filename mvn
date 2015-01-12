@@ -17,7 +17,8 @@ for arg in "$@"; do
   esac
 done
 
-addMvnArgument() {
+addMvnArgument()
+{
   debug "add mvn_argument: $1"
   mvn_arguments=( "${mvn_arguments[@]}" "$1" )
 }
@@ -25,7 +26,8 @@ addMvnArgument() {
 read_properties()
 {
   file="$1"
-  while IFS="=" read -r key value; do
+  IFS="="
+  while read -r key value || [[ -n $value ]]; do
     case "$key" in
       "local_dir") local_dir="$value" ;;
       "mvn_opts") export MAVEN_OPTS="$value" ;;
