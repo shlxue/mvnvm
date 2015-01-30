@@ -198,7 +198,7 @@ prepareDirectories() {
 
 function download() {
   if [ -z "${2}" ]; then
-    return -1
+    return 0
   fi
 
   echoerr "${1}: ${2}"
