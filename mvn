@@ -244,14 +244,18 @@ downloadMaven() {
   fi
 }
 
+unzip() {
+  echoerr "             extracting: $1"
+  unzip -o -qq -d "${local_dir}" "$2"
+  rc=$?; if [[ $rc != 0 ]]; then rm "$2"; exit $rc; fi
+}
+
 unzipMaven() {
   if [[ ! -d "${local_dir}/apache-maven-${mvn_version}" && ! -d "${local_dir}/maven-${mvn_version}" ]]; then
     if [[ -f "${local_dir}/${download_file}" ]]; then
-      echoerr "             extracting: ${local_dir}/apache-maven-${mvn_version}"
-      unzip -o -qq -d "${local_dir}" "${local_dir}/${download_file}"
+      unzip "${local_dir}/apache-maven-${mvn_version}" "${local_dir}/${download_file}"
     else
-      echoerr "             extracting: ${local_dir}/maven-${mvn_version}"
-      unzip -o -qq -d "${local_dir}" "${local_dir}/${download_old_file}"
+      unzip "${local_dir}/maven-${mvn_version}" "${local_dir}/${download_old_file}"
     fi
   fi
 }
