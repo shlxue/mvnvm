@@ -262,7 +262,7 @@ verifyHash() {
       if [[ "${authoritative_hash}" != "${downloaded_hash}" ]]; then
         echoerr "Expected hash (${authoritative_hash}) does not match downloaded file hash (${downloaded_hash})."
         echoerr "Verification failed! Deleting invalid archive. Please try again."
-        rm -f "$1"
+        rm -f "$file"
         exit 1
       fi
     fi
