@@ -236,19 +236,17 @@ downloadMaven() {
 
     for i in "${!urls[@]}"; do
       if download "${names[i]}" "${urls[i]}" "${local_dir}/${download_file}"; then
+        # Only download verification hashes from the authoritative source.
+        [[ $i < 2 ]] && i=2
+        if which curl >/dev/null; then
+          authoritative_hash=`curl --silent --fail ${urls[i]}.sha1`
+        elif which wget >/dev/null; then
+          authoritative_hash=`wget -qO- ${urls[i]}.sha1`
+        fi
+        verifyHash "${local_dir}/${download_file}" "${authoritative_hash}"
         break
       fi
     done
-
-    for i in 2 3 4; do
-      if which curl >/dev/null; then
-        authoritative_hash=`curl --silent --fail ${urls[i]}.sha1`
-      elif which wget >/dev/null; then
-        authoritative_hash=`wget -qO- ${urls[i]}.sha1`
-      fi
-      test -n "${authoritative_hash}" && break
-    done
-    verifyHash "${local_dir}/${download_file}" "${authoritative_hash}"
   fi
 }
 
