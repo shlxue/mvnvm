@@ -50,7 +50,7 @@ process_project()
   found=0
 
   # traverse the directory structure up to root, trying to find a mvnvm.properties file
-  while :
+  while : 
   do
     if [[ -f "$dir/mvnvm.properties" ]]; then
       read_properties "$dir/mvnvm.properties"
@@ -109,7 +109,7 @@ EOR
 fi
 }
 
-process_arguments()
+process_arguments() 
 {
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -141,7 +141,7 @@ make_mirror_url()
 {
   uri="$1"
   version="$2"
-  version_regex="([0-9]+)"
+  version_regex="([0-9]+)" 
   [[ $version =~ ${version_regex} ]]
   major="${BASH_REMATCH[1]}"
   download_file="apache-maven-${version}-bin.zip"
@@ -180,7 +180,7 @@ make_mirror_url()
     if which python >/dev/null; then
       temp=`echo $closer_text \
         | python -c 'import sys, json; print(json.load(sys.stdin)["preferred"])'`
-    else
+    else 
       temp=`echo $closer_text \
         | fgrep preferred \
         | cut -f4 -d\"`
