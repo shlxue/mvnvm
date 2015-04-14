@@ -2,7 +2,7 @@
 
 declare -r default_mvn_version=${DEFAULT_MVN_VERSION:-3.2.5}
 declare -r default_local_dir=${HOME}/.mvnvm
-declare mvn_version user_uri user_download_url mirror_download_url archive_download_url binaries_archive_download_url older_binaries_archive_download_url download_file download_old_file local_dir
+declare mvn_version user_uri central_uri user_download_url mirror_download_url archive_download_url binaries_archive_download_url older_binaries_archive_download_url download_file download_old_file local_dir
 declare -a mvn_arguments
 
 echoerr () { [[ -z $quiet ]] && echo "[MVNVM]" "$@" >&2; }
@@ -114,6 +114,7 @@ process_arguments()
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --apache-mirror) user_uri="$2" && shift 2 && debug "set user_uri: ${user_uri}" ;;
+      --central-mirror) central_uri="$2" && shift 2 && debug "set central_uri: ${central_uri}" ;;
       --mvn-version) mvn_version="$2" && shift 2 && debug "set mvn_version: ${mvn_version}" ;;
       -d) shift ;;
       *) addMvnArgument "$1" && shift ;;
@@ -128,7 +129,15 @@ process_defaults()
   local_dir=${default_local_dir}
 }
 
-make_url()
+make_central_url()
+{
+  uri="$1"
+  version="$2"
+  download_file="apache-maven-${version}-bin.zip"
+  release_download_url="${uri}/org/apache/maven/apache-maven/${version}/${download_file}"
+}
+
+make_mirror_url()
 {
   uri="$1"
   version="$2"
@@ -178,6 +187,15 @@ make_url()
     fi
 
     release_download_url="${temp}${download_path_url}"
+  fi
+}
+
+make_url()
+{
+  if [ -z "${central_uri}" ]; then
+    make_mirror_url "$1" "$2"
+  else
+    make_central_url "${central_uri}" "$2"
   fi
 }
 
