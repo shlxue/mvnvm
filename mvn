@@ -67,24 +67,18 @@ process_project()
 {
   dir="`pwd`"
 
-  # traverse the directory structure up to root, trying to find a mvnvm.properties file
+  # traverse the directory structure up to root, initially looking in pom for a maven version and then trying to read a mvnvm.properties file if exists
   while : 
   do
 
       if [ ${mvn_version_configured} -eq 0 ]; then
-        if project_mvn_version=$(ruby - <<EOR
+        if project_mvn_version=$(ruby - "$dir" <<EOR
 #!/usr/bin/ruby -w
 
 require 'rexml/document'
 include REXML
 
-dir = '$dir'
-
-if (dir === '/')
-  pomfile = ARGV.concat( [ '$dir', 'pom.xml'] ).join("")
-else
-  pomfile = ARGV.concat( [ '$dir', 'pom.xml'] ).join("/")
-end
+pomfile = File.join(ARGV[0], "pom.xml")
 
 if !File.file?(pomfile)
   exit 5
