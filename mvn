@@ -4,6 +4,7 @@ declare -r default_mvn_version=${DEFAULT_MVN_VERSION:-3.2.5}
 declare -r default_local_dir=${HOME}/.mvnvm
 declare mvn_version user_uri central_uri user_download_url mirror_download_url archive_download_url binaries_archive_download_url older_binaries_archive_download_url download_file download_old_file local_dir
 declare -a mvn_arguments
+declare mvn_version_configured local_dir_configured mvn_opts_configured user_uri_configured
 
 echoerr () { [[ -z $quiet ]] && echo "[MVNVM]" "$@" >&2; }
 debug()    { [[ -n $debug ]] && echoerr "$@"; }
@@ -29,10 +30,26 @@ read_properties()
   local IFS="="
   while read -r key value || [[ -n $value ]]; do
     case "$key" in
-      "local_dir") local_dir="$value" ;;
-      "mvn_opts") export MAVEN_OPTS="$value" ;;
-      "mvn_version") mvn_version="$value" ;;
-      "user_uri") user_uri="$value" ;;
+      "local_dir")    if [ ${local_dir_configured} -eq 0 ]; then 
+                        local_dir="$value"
+                        local_dir_configured=1
+                        debug "Local dir set to $local_dir"
+                      fi ;;
+      "mvn_opts")     if [ ${mvn_opts_configured} -eq 0 ]; then 
+                        export MAVEN_OPTS="$value"
+                        mvn_opts_configured=1
+                        debug "Maven opts set to $mvn_opts"
+                      fi ;;
+      "mvn_version")  if [ ${mvn_version_configured} -eq 0 ]; then 
+                        mvn_version="$value" 
+                        mvn_version_configured=1
+                        debug "Maven version set to $mvn_version"
+                      fi ;;
+      "user_uri")     if [ ${user_uri_configured} -eq 0 ]; then
+                        user_uri="$value" 
+                        user_uri_configured=1
+                        debug "User uri set to $user_uri"
+                      fi ;;
     esac
   done < "$file"
 }
@@ -42,38 +59,32 @@ process_user_defaults()
   if [[ -f ~/.mvnvm.properties ]]; then
     read_properties ~/.mvnvm.properties
   fi
+
+  debug "Processed user values"
 }
 
 process_project()
 {
   dir="`pwd`"
-  found=0
 
   # traverse the directory structure up to root, trying to find a mvnvm.properties file
   while : 
   do
-    if [[ -f "$dir/mvnvm.properties" ]]; then
-      read_properties "$dir/mvnvm.properties"
-      found=1
-      debug "Found mvnvm.properties file at $dir"
-      break
-    fi
-    
-    if [[ "$dir" == '/' ]]; then
-      break
-    fi
 
-    dir=`dirname "$dir"`
-  done
-
-  if [[ ${found} -eq 0 ]]; then
-    if project_mvn_version="$(ruby <<"EOR"
+      if [ ${mvn_version_configured} -eq 0 ]; then
+        if project_mvn_version=$(ruby - <<EOR
 #!/usr/bin/ruby -w
 
 require 'rexml/document'
 include REXML
 
-pomfile = ARGV.concat( ['pom.xml'] )[0]
+dir = '$dir'
+
+if (dir === '/')
+  pomfile = ARGV.concat( [ '$dir', 'pom.xml'] ).join("")
+else
+  pomfile = ARGV.concat( [ '$dir', 'pom.xml'] ).join("/")
+end
 
 if !File.file?(pomfile)
   exit 5
@@ -103,10 +114,27 @@ else
   end
 end
 EOR
-)"; then
-    mvn_version="$project_mvn_version"
-  fi
-fi
+); then
+        mvn_version="$project_mvn_version"
+        mvn_version_configured=1
+        debug "Found maven version in pom file at $dir, and set to $mvn_version"
+      fi
+    fi
+
+    if [[ -f "$dir/mvnvm.properties" ]]; then
+      read_properties "$dir/mvnvm.properties"
+      debug "Found mvnvm.properties file at $dir"
+    fi
+    
+    if [ "$dir" == '/' ]; then
+      break
+    fi
+
+    dir=`dirname "$dir"`
+
+  done
+
+  debug "Processed project values"
 }
 
 process_arguments() 
@@ -120,6 +148,8 @@ process_arguments()
       *) addMvnArgument "$1" && shift ;;
     esac
   done
+
+  debug "Processed arguments"
 }
 
 process_defaults()
@@ -127,6 +157,13 @@ process_defaults()
   user_uri=""
   mvn_version=${default_mvn_version}
   local_dir=${default_local_dir}
+
+  mvn_version_configured=0
+  local_dir_configured=0
+  mvn_opts_configured=0
+  user_uri_configured=0
+
+  debug "Processed default values"
 }
 
 make_central_url()
