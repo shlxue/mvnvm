@@ -30,26 +30,30 @@ read_properties()
   local IFS="="
   while read -r key value || [[ -n $value ]]; do
     case "$key" in
-      "local_dir")    if [ ${local_dir_configured} -eq 0 ]; then 
-                        local_dir="$value"
-                        local_dir_configured=1
-                        debug "Local dir set to $local_dir"
-                      fi ;;
-      "mvn_opts")     if [ ${mvn_opts_configured} -eq 0 ]; then 
-                        export MAVEN_OPTS="$value"
-                        mvn_opts_configured=1
-                        debug "Maven opts set to $mvn_opts"
-                      fi ;;
-      "mvn_version")  if [ ${mvn_version_configured} -eq 0 ]; then 
-                        mvn_version="$value" 
-                        mvn_version_configured=1
-                        debug "Maven version set to $mvn_version"
-                      fi ;;
-      "user_uri")     if [ ${user_uri_configured} -eq 0 ]; then
-                        user_uri="$value" 
-                        user_uri_configured=1
-                        debug "User uri set to $user_uri"
-                      fi ;;
+      "local_dir")    
+        if [ ${local_dir_configured} -eq 0 ]; then 
+          local_dir="$value"
+          local_dir_configured=1
+          debug "Local dir set to $local_dir"
+        fi ;;
+      "mvn_opts")     
+        if [ ${mvn_opts_configured} -eq 0 ]; then 
+          export MAVEN_OPTS="$value"
+          mvn_opts_configured=1
+          debug "Maven opts set to $mvn_opts"
+        fi ;;
+      "mvn_version")  
+        if [ ${mvn_version_configured} -eq 0 ]; then 
+          mvn_version="$value" 
+          mvn_version_configured=1
+          debug "Maven version set to $mvn_version"
+        fi ;;
+      "user_uri")     
+        if [ ${user_uri_configured} -eq 0 ]; then
+          user_uri="$value" 
+          user_uri_configured=1
+          debug "User uri set to $user_uri"
+        fi ;;
     esac
   done < "$file"
 }
@@ -68,6 +72,11 @@ process_project()
   dir="`pwd`"
 
   # traverse the directory structure up to root, initially looking in pom for a maven version and then trying to read a mvnvm.properties file if exists
+  # Will always go all way to root, but will give precedence to settings found higher in the hierachy. For example:
+  #     You have a pom file that specifies a requiredMavenVersion in a plugin folder, and then a parent folder with a mvnvm.properties file.
+  #     If you run from the plugin folder, the maven version will come from the pom, and not be overridden by mvnvm.properties at higher level,
+  #     but any other properties will still be read and used. After this operation, the user mvnvm properties will be read, but any values that have
+  #     already been set, will not be overridden.
   while : 
   do
 
