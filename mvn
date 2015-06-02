@@ -4,7 +4,7 @@ declare -r default_mvn_version=${DEFAULT_MVN_VERSION:-3.2.5}
 declare -r default_local_dir=${HOME}/.mvnvm
 declare mvn_version user_uri central_uri user_download_url mirror_download_url archive_download_url binaries_archive_download_url older_binaries_archive_download_url download_file download_old_file local_dir
 declare -a mvn_arguments
-declare mvn_version_configured local_dir_configured mvn_opts_configured user_uri_configured
+declare mvn_version_configured local_dir_configured mvn_opts_configured user_uri_configured central_uri_configured
 
 echoerr () { [[ -z $quiet ]] && echo "[MVNVM]" "$@" >&2; }
 debug()    { [[ -n $debug ]] && echoerr "$@"; }
@@ -54,6 +54,12 @@ read_properties()
           user_uri_configured=1
           debug "User uri set to $user_uri"
         fi ;;
+      "central_uri")
+        if [ ${central_uri_configured} -eq 0 ]; then
+          central_uri="$value" 
+          central_uri_configured=1
+          debug "Central uri set to $central_uri"
+        fi ;; 
     esac
   done < "$file"
 }
@@ -165,6 +171,7 @@ process_defaults()
   local_dir_configured=0
   mvn_opts_configured=0
   user_uri_configured=0
+  central_uri_configured=0
 
   debug "Processed default values"
 }
