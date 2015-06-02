@@ -244,8 +244,10 @@ execRunner () {
   export M2_HOME="${MVN_HOME}"
   export MVN_OPT=""
 
-  debug "Will execute ${M2_HOME}/bin/mvn ${@:2}"
-  exec "${M2_HOME}/bin/mvn" "${@:2}"
+  mvn_exe="${M2_HOME}/bin/$(basename $0)"
+
+  debug "Will execute ${mvn_exe} ${@:2}"
+  exec "${mvn_exe}" "${@:2}"
 }
 
 prepareDirectories() {
