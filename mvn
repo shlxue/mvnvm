@@ -80,8 +80,13 @@ process_project()
   while : 
   do
 
-      if [ ${mvn_version_configured} -eq 0 ]; then
-        if project_mvn_version=$(ruby - "$dir" <<EOR
+    if [[ -f "$dir/mvnvm.properties" ]]; then
+      read_properties "$dir/mvnvm.properties"
+      debug "Found mvnvm.properties file at $dir"
+    fi
+
+    if [ ${mvn_version_configured} -eq 0 ]; then
+      if project_mvn_version=$(ruby - "$dir" <<EOR
 #!/usr/bin/ruby -w
 
 require 'rexml/document'
@@ -124,11 +129,6 @@ EOR
       fi
     fi
 
-    if [[ -f "$dir/mvnvm.properties" ]]; then
-      read_properties "$dir/mvnvm.properties"
-      debug "Found mvnvm.properties file at $dir"
-    fi
-    
     if [ "$dir" == '/' ]; then
       break
     fi
