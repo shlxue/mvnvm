@@ -6,6 +6,7 @@ declare mvn_version user_uri central_uri user_download_url mirror_download_url a
 declare -a mvn_arguments
 declare mvn_version_configured local_dir_configured mvn_opts_configured user_uri_configured
 
+echoout () { [[ -z $quiet ]] && echo "[MVNVM]" "$@"; }
 echoerr () { [[ -z $quiet ]] && echo "[MVNVM]" "$@" >&2; }
 debug()    { [[ -n $debug ]] && echoerr "$@"; }
 
@@ -259,7 +260,7 @@ function download() {
     return 1
   fi
 
-  echoerr "${1}: ${2}"
+  echoout "${1}: ${2}"
   if which curl >/dev/null; then
     if [[ -n $debug ]]; then
       curl --silent --show-error --fail "${2}" --output "${3}"
@@ -274,14 +275,14 @@ function download() {
 
 downloadMaven() {
   if [[ ! -f "${local_dir}/${download_file}" ]]; then
-    echoerr  "            downloading: ${download_file}"
-    echoerr  "                     to: ${local_dir}/${download_file}"
+    echoout  "            downloading: ${download_file}"
+    echoout  "                     to: ${local_dir}/${download_file}"
     
     if [ -z "$user_download_url" ]; then
         # nothing
         true
     else
-        echoerr "                 trying: ${user_download_url}"
+        echoout "                 trying: ${user_download_url}"
     fi
 
     urls[0]="${user_download_url}"
@@ -324,7 +325,7 @@ verifyHash() {
       local downloaded_hash=`shasum "$file" | awk '{ print $1 }'`
     fi
     if [ -n "${downloaded_hash}" ]; then
-      echoerr "              verifying: $file"
+      echoout "              verifying: $file"
       if [[ "${authoritative_hash}" != "${downloaded_hash}" ]]; then
         echoerr "Expected hash (${authoritative_hash}) does not match downloaded file hash (${downloaded_hash})."
         echoerr "Verification failed! Deleting invalid archive. Please try again."
@@ -336,7 +337,7 @@ verifyHash() {
 }
 
 unzipCheck() {
-  echoerr "             extracting: $1"
+  echoout "             extracting: $1"
   unzip -o -qq -d "${local_dir}" "$2"
   rc=$?; if [[ $rc != 0 ]]; then rm "$2"; exit $rc; fi
 }
@@ -358,7 +359,7 @@ process_arguments "$@"
 
 debug "maven version: ${mvn_version}"
 
-echoerr "Using maven: ${mvn_version}"
+echoout "Using maven: ${mvn_version}"
 
 if [[ ! -d "${local_dir}/apache-maven-${mvn_version}" && ! -d "${local_dir}/maven-${mvn_version}" ]]; then
   debug "Maven ${mvn_version} not currently installed"
