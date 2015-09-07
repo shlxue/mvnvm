@@ -261,7 +261,11 @@ function download() {
 
   echoerr "${1}: ${2}"
   if which curl >/dev/null; then
-    curl --silent --fail "${2}" --output "${3}"
+    if [[ -n $debug ]]; then
+      curl --silent --show-error --fail "${2}" --output "${3}"
+    else
+      curl --silent --fail "${2}" --output "${3}"
+    fi
   elif which wget >/dev/null; then
     wget --quiet -O "${3}" "${2}"
   fi
@@ -305,6 +309,10 @@ downloadMaven() {
         break
       fi
     done
+    if [ ! -f "${local_dir}/${download_file}" ]; then
+      echoerr "Could not download ${download_file} from any location"
+      exit 1
+    fi
   fi
 }
 
