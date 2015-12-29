@@ -388,7 +388,7 @@ else
 fi
 
 if [[ -n "${download_only}" ]]; then
-  debug "${mvn_version} is now downloaded, exiting gracefuly"
+  debug "${mvn_version} is now downloaded, exiting gracefully"
   exit 0
 fi
 
