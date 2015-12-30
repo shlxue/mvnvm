@@ -2,7 +2,7 @@
 
 declare -r default_mvn_version=${DEFAULT_MVN_VERSION:-3.3.9}
 declare -r default_local_dir=${HOME}/.mvnvm
-declare mvn_version user_uri central_uri user_download_url mirror_download_url archive_download_url binaries_archive_download_url older_binaries_archive_download_url download_file download_old_file local_dir print_home
+declare mvn_version user_uri central_uri user_download_url mirror_download_url archive_download_url binaries_archive_download_url older_binaries_archive_download_url download_file download_old_file local_dir print_home download_only
 declare -a mvn_arguments
 declare mvn_version_configured local_dir_configured mvn_opts_configured user_uri_configured central_uri_configured
 
@@ -31,36 +31,36 @@ read_properties()
   local IFS="="
   while read -r key value || [[ -n $value ]]; do
     case "$key" in
-      "local_dir")    
-        if [ ${local_dir_configured} -eq 0 ]; then 
+      "local_dir")
+        if [ ${local_dir_configured} -eq 0 ]; then
           local_dir="$value"
           local_dir_configured=1
           debug "Local dir set to $local_dir"
         fi ;;
-      "mvn_opts")     
-        if [ ${mvn_opts_configured} -eq 0 ]; then 
+      "mvn_opts")
+        if [ ${mvn_opts_configured} -eq 0 ]; then
           export MAVEN_OPTS="$value"
           mvn_opts_configured=1
           debug "Maven opts set to $MAVEN_OPTS"
         fi ;;
-      "mvn_version")  
-        if [ ${mvn_version_configured} -eq 0 ]; then 
-          mvn_version="$value" 
+      "mvn_version")
+        if [ ${mvn_version_configured} -eq 0 ]; then
+          mvn_version="$value"
           mvn_version_configured=1
           debug "Maven version set to $mvn_version"
         fi ;;
-      "user_uri")     
+      "user_uri")
         if [ ${user_uri_configured} -eq 0 ]; then
-          user_uri="$value" 
+          user_uri="$value"
           user_uri_configured=1
           debug "User uri set to $user_uri"
         fi ;;
       "central_uri")
         if [ ${central_uri_configured} -eq 0 ]; then
-          central_uri="$value" 
+          central_uri="$value"
           central_uri_configured=1
           debug "Central uri set to $central_uri"
-        fi ;; 
+        fi ;;
     esac
   done < "$file"
 }
@@ -84,7 +84,7 @@ process_project()
   #     If you run from the plugin folder, the maven version will come from the pom, and not be overridden by mvnvm.properties at higher level,
   #     but any other properties will still be read and used. After this operation, the user mvnvm properties will be read, but any values that have
   #     already been set, will not be overridden.
-  while : 
+  while :
   do
 
     if [[ -f "$dir/mvnvm.properties" ]]; then
@@ -147,7 +147,7 @@ EOR
   debug "Processed project values"
 }
 
-process_arguments() 
+process_arguments()
 {
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -155,6 +155,7 @@ process_arguments()
       --central-mirror) central_uri="$2" && shift 2 && debug "set central_uri: ${central_uri}" ;;
       --mvn-version) mvn_version="$2" && shift 2 && debug "set mvn_version: ${mvn_version}" ;;
       --home) print_home=true && shift && debug "set print_home: ${print_home}" ;;
+      --download-only) download_only=true && shift && debug "set download_only: ${download_only}" ;;
       -d) shift ;;
       *) addMvnArgument "$1" && shift ;;
     esac
@@ -190,7 +191,7 @@ make_mirror_url()
 {
   uri="$1"
   version="$2"
-  version_regex="([0-9]+)" 
+  version_regex="([0-9]+)"
   [[ $version =~ ${version_regex} ]]
   major="${BASH_REMATCH[1]}"
   download_file="apache-maven-${version}-bin.zip"
@@ -224,12 +225,12 @@ make_mirror_url()
   if [ -z "$closer_text" ]; then
     release_download_url=""
   else
-    # extract the preferred mirror url from returned 
+    # extract the preferred mirror url from returned
     # use python if it is available, otherwise fall back to attempt scraping from text
     if which python >/dev/null; then
       temp=`echo $closer_text \
         | python -c 'import sys, json; print(json.load(sys.stdin)["preferred"])'`
-    else 
+    else
       temp=`echo $closer_text \
         | fgrep preferred \
         | cut -f4 -d\"`
@@ -290,7 +291,7 @@ downloadMaven() {
   if [[ ! -f "${local_dir}/${download_file}" ]]; then
     echoout  "            downloading: ${download_file}"
     echoout  "                     to: ${local_dir}/${download_file}"
-    
+
     if [ -z "$user_download_url" ]; then
         # nothing
         true
@@ -384,6 +385,11 @@ if [[ ! -d "${local_dir}/apache-maven-${mvn_version}" && ! -d "${local_dir}/mave
   unzipMaven
 else
   debug "Maven ${mvn_version} is installed"
+fi
+
+if [[ -n "${download_only}" ]]; then
+  debug "${mvn_version} is now downloaded, exiting gracefully"
+  exit 0
 fi
 
 if [[ -d "${local_dir}/apache-maven-${mvn_version}" ]]; then
