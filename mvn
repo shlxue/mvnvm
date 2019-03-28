@@ -218,7 +218,7 @@ make_mirror_url()
 
   # instead of always using archive url, use the recommended apache mirror initially
   if which curl >/dev/null; then
-    closer_text=`curl --silent --fail https://www.apache.org/dyn/closer.cgi?asjson=1`
+    closer_text=`curl -L --silent --fail https://www.apache.org/dyn/closer.cgi?asjson=1`
   elif which wget >/dev/null; then
     closer_text=`wget -qO- https://www.apache.org/dyn/closer.cgi?asjson=1`
   fi
@@ -278,9 +278,9 @@ function download() {
   echoout "${1}: ${2}"
   if which curl >/dev/null; then
     if [[ -n $debug ]]; then
-      curl --silent --show-error --fail "${2}" --output "${3}"
+      curl -L --silent --show-error --fail "${2}" --output "${3}"
     else
-      curl --silent --fail "${2}" --output "${3}"
+      curl -L --silent --fail "${2}" --output "${3}"
     fi
   elif which wget >/dev/null; then
     wget --quiet -O "${3}" "${2}"
@@ -317,7 +317,7 @@ downloadMaven() {
         # Only download verification hashes from the authoritative source.
         [[ $i < 2 ]] && i=2
         if which curl >/dev/null; then
-          authoritative_hash=`curl --silent --fail ${urls[i]}.sha1`
+          authoritative_hash=`curl -L --silent --fail ${urls[i]}.sha1`
         elif which wget >/dev/null; then
           authoritative_hash=`wget -qO- ${urls[i]}.sha1`
         fi
