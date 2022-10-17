@@ -1,12 +1,12 @@
-Maven Version Manager
-=====================
+# Maven Version Manager
+
+[![Atlassian license](https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=flat-square)](LICENSE) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](CONTRIBUTING.md)
 
 A simpler way to invoke maven and manage the version of maven within your team.
 
 http://mvnvm.org
 
-Usage
------
+## Usage
 
 Set the Maven version with `mvn_version` in `mvnvm.properties` in your project directory:
 
@@ -15,7 +15,7 @@ Set the Maven version with `mvn_version` in `mvnvm.properties` in your project d
     
 Alternatively, set properties in `${HOME}/.mvnvm.properties` to apply to all projects for your user.
 	
-### Advanced Usage
+## Advanced Usage
 
 | Properties valid in `mvnvm.properties` | Command line argument equivalent | Description                                                                                                     |
 |----------------------------------------|----------------------------------|-----------------------------------------------------------------------------------------------------------------|
@@ -33,3 +33,14 @@ Other command line arguments:
 * `-d` - enables `mvnvm` debug
 
 All other command line arguments are passed to `mvn`.
+
+## Contributions
+
+Contributions to MVNVM are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details. 
+
+## License
+
+Copyright (c) [YYYY] - [YYYY] Atlassian and others.
+Apache 2.0 licensed, see [LICENSE](LICENSE) file.
+
+[![With â¤ï¸ from Atlassian](https://raw.githubusercontent.com/atlassian-internal/oss-assets/master/banner-cheers.png)](https://www.atlassian.com)
