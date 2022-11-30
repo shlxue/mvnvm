@@ -11,7 +11,7 @@ http://mvnvm.org
 Set the Maven version with `mvn_version` in `mvnvm.properties` in your project directory:
 
     $ cat mvnvm.properties
-    mvn_version=3.5.0
+    mvn_version=3.8.6
     
 Alternatively, set properties in `${HOME}/.mvnvm.properties` to apply to all projects for your user.
 	
@@ -40,7 +40,7 @@ Contributions to MVNVM are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md
 
 ## License
 
-Copyright (c) [YYYY] - [YYYY] Atlassian and others.
+Copyright (c) [2013] - [2022] Atlassian and others.
 Apache 2.0 licensed, see [LICENSE](LICENSE) file.
 
 [![With â¤ï¸ from Atlassian](https://raw.githubusercontent.com/atlassian-internal/oss-assets/master/banner-cheers.png)](https://www.atlassian.com)
