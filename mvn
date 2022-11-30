@@ -122,8 +122,9 @@ if enforcerVersion
   end
 else
   prereq = XPath.first(xmldoc, '/project/prerequisites/maven')
-  if prereq
-    puts prereq.text
+  # A specific numeric version?
+  if prereq && prereq.text.match(/^[\d\.]+$/)
+      puts prereq.text
   else
     exit 5
   end
