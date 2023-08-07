@@ -11,7 +11,7 @@ http://mvnvm.org
 Set the Maven version with `mvn_version` in `mvnvm.properties` in your project directory:
 
     $ cat mvnvm.properties
-    mvn_version=3.9.3
+    mvn_version=3.9.4
     
 Alternatively, set properties in `${HOME}/.mvnvm.properties` to apply to all projects for your user.
 	
